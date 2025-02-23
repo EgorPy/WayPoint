@@ -15,6 +15,7 @@ const MapComponent: React.FC = () => {
     const coords = e.get("coords");
     setMarkerPosition(coords);
     console.log(`Координаты: ${coords}`);
+    console.log(123);
 
     try {
       const res = await ymapsInstance.geocode(coords);
