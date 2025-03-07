@@ -44,3 +44,115 @@
     transform: rotate(360deg);
   }
 }
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.booking-form {
+  z-index: 999;
+  /* pointer-events: none; */
+  display: flex;
+  gap: 10px;
+  padding: 20px;
+  background: none;
+  position: fixed;
+  top: 0px;
+  left: 0;
+  right: 0;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+  justify-content: center;
+}
+
+.booking-form input,
+.booking-form select,
+.booking-form button {
+  pointer-events: auto;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: none;
+}
+
+.booking-form button {
+  background: rgb(74, 170, 255);
+  color: white;
+  cursor: pointer;
+}
+
+.input-container {
+  position: relative;
+}
+
+.suggestions {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  /* border: 1px solid #ccc; */
+  border-radius: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  z-index: 1000;
+  touch-action: auto;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(5px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 1000;
+}
+
+input:focus + .suggestions {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+input:focus + .suggestions li {
+  pointer-events: all;
+}
+
+.suggestions li {
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background 0.2s;
+  pointer-events: auto;
+}
+
+.suggestions li:hover {
+  background: #f0f0f0;
+}
+
+@media (max-width: 1270px) {
+  .booking-form {
+      flex-direction: column;
+      background: #ffffff3d;
+      bottom: 0px;
+      align-self: end;
+      border-radius: 40px 40px 0px 0px;
+      backdrop-filter: blur(5px);
+  }
+
+  .suggestions {
+    flex-direction: column-reverse;
+    bottom: 100%;
+    top: auto;
+    margin-bottom: 4px;
+  }
+
+  input {
+    width: -webkit-fill-available;
+  }
+}
+
+/* div {
+  outline: 1px solid red;
+} */

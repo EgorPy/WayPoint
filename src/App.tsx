@@ -4,6 +4,7 @@ import MapComponent from "./components/MapComponent";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import Header from "./components/Header";
+// import BookingForm from "./components/MapComponent";
 
 const App: React.FC = () => {
   const isAuthenticated = !!localStorage.getItem("token");
@@ -16,6 +17,9 @@ const App: React.FC = () => {
         <Route path="/" element={isAuthenticated ? <MapComponent /> : <Navigate to="/login" />} />
       </Routes>
       <Header />
+      {/* <Routes>
+        <Route path="/" element={isAuthenticated ? <BookingForm />: <Navigate to="/login" />} />
+      </Routes> */}
     </Router>
   );
 };
