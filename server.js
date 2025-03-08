@@ -1,10 +1,14 @@
-import express from "express";
+import { readFile } from "fs/promises";
 import fetch from "node-fetch";
+import express from "express";
 import cors from "cors";
 
 const app = express();
-const PORT = 5000;
-const SUGGEST_API_KEY = "b1d01e5e-11d5-4dd7-93a0-87cdeef3e161";
+const data = await readFile("./src/config.json", "utf-8");
+const config = JSON.parse(data);
+
+const PORT = config.YMAPS_PROXY_PORT;
+const SUGGEST_API_KEY = config.YMAPS_SUGGEST_KEY;
 const SUGGEST_URL = "https://suggest-maps.yandex.ru/v1/suggest";
 
 app.use(cors());

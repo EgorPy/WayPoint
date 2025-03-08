@@ -1,5 +1,6 @@
-import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import "./AuthStyles.css";
 
 const RegisterPage: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -18,7 +19,7 @@ const RegisterPage: React.FC = () => {
     const response = await fetch("/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: formData.toString()
+      body: formData.toString(),
     });
 
     if (response.ok) {
@@ -30,17 +31,19 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: "20px", marginTop: "8vh" }}>
-      <h2>Регистрация</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={handleRegister}>
-        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <input type="password" placeholder="Пароль" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        <button type="submit">Зарегистрироваться</button>
-      </form>
-      <p>
-        Уже есть аккаунт? <a href="/login">Войти</a>
-      </p>
+    <div className="auth-container">
+      <div className="auth-box">
+        <h2>Регистрация</h2>
+        {error && <p className="auth-error">{error}</p>}
+        <form onSubmit={handleRegister}>
+          <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <input type="password" placeholder="Пароль" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          <button type="submit">Зарегистрироваться</button>
+        </form>
+        <p className="auth-link">
+          Уже есть аккаунт? <a href="/login">Войти</a>
+        </p>
+      </div>
     </div>
   );
 };

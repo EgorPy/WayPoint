@@ -1,5 +1,5 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
+import React from "react";
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
@@ -11,42 +11,23 @@ const Header: React.FC = () => {
     window.location.reload();
   };
 
-  const headerStyle: React.CSSProperties = {
-    display: "flex",
-    justifyContent: "space-between",
-    background: "rgba(255, 255, 255, 0.05)",
-    position: "absolute",
-    color: "#4aaaff",
-    width: "100%",
-    alignItems: "center",
-    top: 0,
-    height: "fit-content",
-    backdropFilter: "blur(5px)",
-    borderBottomLeftRadius: "30px",
-    borderBottomRightRadius: "30px",
-  };
-  
-  const buttonStyle: React.CSSProperties = {
-    marginRight: "40px",
-    background: "#0000003d",
-    color: "white",
-    border: "none",
-    padding: "16px 32px",
-    borderRadius: "20px",
-    cursor: "pointer",
-    height: "fit-content",
-    fontSize: "20px",
-  }
-
   return (
-    <header style={headerStyle}>
-      <h1 style={{ marginLeft: "40px"}}>WayPoint</h1>
+    <header className="header">
+      <div className="left-header">
+        <a href="/" className="logo">WayPoint</a>
+        {isAuthenticated && (
+          <button onClick={() => navigate("/routes")} className="routes-button">
+            Маршруты
+          </button>
+        )}
+      </div>
+
       {isAuthenticated ? (
-        <button onClick={handleLogout} style={buttonStyle}>
+        <button onClick={handleLogout} className="log-button">
           Выйти
         </button>
       ) : (
-        <button onClick={() => navigate("/login")} style={ buttonStyle }>
+        <button onClick={() => navigate("/login")} className="log-button">
           Войти
         </button>
       )}

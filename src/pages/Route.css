@@ -1,0 +1,85 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+.order-page {
+  background: url('../background.jpg') no-repeat center center/cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.route-id {
+  cursor: pointer;
+  display: inline-block;
+  padding: 28px 24px;
+  margin-top: 16px;
+  font-size: 18px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  transition: background 0.2s ease;
+}
+
+.route-id:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.copy-notification {
+  position: absolute;
+  color: lightgreen;
+  font-size: 14px;
+  margin-top: 0px;
+  animation: fadeOut 1.5s forwards;
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.order-container {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  color: #fff;
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.order-details {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.route-visual {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.route-city {
+  font-weight: bold;
+}
+
+.route-line {
+  flex: 1;
+  height: 2px;
+  background: white;
+}
+
+.icon {
+  font-size: 24px;
+}

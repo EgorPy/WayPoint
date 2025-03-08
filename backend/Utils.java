@@ -1,12 +1,28 @@
 import com.sun.net.httpserver.HttpExchange;
+import java.nio.charset.StandardCharsets;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class Utils {
+    public static String readRequestBody(HttpExchange exchange) throws IOException {
+        InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8);
+        BufferedReader br = new BufferedReader(isr);
+        StringBuilder requestBody = new StringBuilder();
+        String line;
+        while ((line = br.readLine()) != null) {
+            requestBody.append(line);
+        }
+        br.close();
+        isr.close();
+        return requestBody.toString();
+    }
+
     public static Map<String, String> parseFormData(HttpExchange exchange) throws IOException {
         InputStream is = exchange.getRequestBody();
         String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
