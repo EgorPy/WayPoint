@@ -10,6 +10,7 @@
 }
 
 .routes-container {
+    margin-top: 150px;
     width: 40%;
     max-height: 80vh;
     padding: 30px;

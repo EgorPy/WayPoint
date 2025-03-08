@@ -4,13 +4,13 @@ body {
   font-family: Arial, sans-serif;
 }
 
-.order-page {
+/* .order-page {
   background: url('../background.jpg') no-repeat center center/cover;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-}
+} */
 
 .route-id {
   cursor: pointer;
