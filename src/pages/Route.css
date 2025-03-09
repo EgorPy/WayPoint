@@ -4,6 +4,25 @@ body {
   font-family: Arial, sans-serif;
 }
 
+.back-arrow {
+  position: absolute;
+  top: 40px;
+  left: 30px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.order-container {
+  position: relative;
+  padding: 40px 20px 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  margin: auto;
+  text-align: center;
+}
+
 /* .order-page {
   background: url('../background.jpg') no-repeat center center/cover;
   display: flex;
@@ -58,7 +77,8 @@ h1 {
 }
 
 .order-details {
-  font-size: 18px;
+  font-size: 20px;
+  font-weight: bold;
   margin-bottom: 10px;
 }
 
@@ -71,6 +91,7 @@ h1 {
 }
 
 .route-city {
+  font-size: 22px;
   font-weight: bold;
 }
 
@@ -82,4 +103,36 @@ h1 {
 
 .icon {
   font-size: 24px;
+}
+
+@media (max-width: 600px) {
+  .route-city {
+    font-size: 18px;
+  }
+
+  .order-details {
+    font-size: 18px;
+  }
+}
+
+.cancel-button {
+  background: #ffffff20;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  padding: 12px 20px;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background 0.2s ease;
+}
+
+.cancel-button:hover {
+  background: #ffffff60;
+}
+
+.cancel-button:disabled {
+  background: #999;
+  cursor: not-allowed;
 }

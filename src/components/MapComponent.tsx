@@ -117,7 +117,7 @@ const MapComponent: React.FC = () => {
       if (from) {
         const result = await ymapsRef.current.geocode(from);
         const firstGeoObject = result.geoObjects.get(0);
-        cityFrom = firstGeoObject?.getLocalities()?.[0] || "";
+        cityFrom = firstGeoObject?.getLocalities()?.[0] || firstGeoObject?.getAdministrativeAreas()?.[0] || from;
       }
       if (to) {
         const result = await ymapsRef.current.geocode(to);
@@ -232,7 +232,7 @@ const MapComponent: React.FC = () => {
         <button type="submit">Найти</button>
       </form>
       <Map
-        defaultState={{ center: [55.751574, 37.573856], zoom: 17, controls: [] }}
+        defaultState={{ center: [55.751574, 37.573856], zoom: 12, controls: [] }}
         width="100%"
         height="100vh"
         options={{ yandexMapDisablePoiInteractivity: true }}
