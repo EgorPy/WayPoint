@@ -2,10 +2,13 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import java.nio.charset.StandardCharsets;
 import com.sun.net.httpserver.HttpServer;
+import java.util.function.Supplier;
 import java.net.InetSocketAddress;
 import java.util.regex.Pattern;
 import java.io.OutputStream;
 import java.io.IOException;
+import java.util.UUID;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -16,9 +19,11 @@ public class Api {
         server.createContext("/api/hello", new HelloHandler());
         server.createContext("/api/register", new RegisterHandler());
         server.createContext("/api/login", new LoginHandler());
-        server.createContext("/api/create_route", new CreateRouteHandler());
+        server.createContext("/api/find_routes", new FindRoutesHandler());
+        server.createContext("/api/all_routes", new AllRoutesHandler());
+        server.createContext("/api/book_route", new BookRouteHandler());
         server.createContext("/api/route", new RouteHandler());
-        server.createContext("/api/routes", new RoutesHandler());
+        server.createContext("/api/routes", new UserRoutesHandler());
         server.createContext("/api/cancel", new CancelHandler());
 
         server.setExecutor(null);
@@ -34,7 +39,53 @@ public class Api {
         }
     }
 
-    static class RoutesHandler implements HttpHandler {
+    static class BookRouteHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            if (handleCors(exchange)) return;
+            if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+                sendResponse(exchange, 405, "{\"error\": \"Метод не поддерживается\"}");
+                return;
+            }
+
+            String requestBody = Utils.readRequestBody(exchange);
+            Map<String, String> requestData = Utils.parseQueryParams(requestBody);
+
+            String city_from = requestData.get("city_from");
+            String city_to = requestData.get("city_to");
+            String transport = requestData.get("transport");
+            String routesJson = requestData.get("routes");
+            String email = requestData.get("email");
+            String date = requestData.get("date");
+
+            if (email == null || routesJson == null) {
+                sendResponse(exchange, 400, "{\"error\": \"Недостаточно данных для бронирования\"}");
+                return;
+            }
+
+            List<List<Route>> selectedRoutes = Utils.parseJsonToRoutes(routesJson);
+            if (selectedRoutes == null || selectedRoutes.isEmpty()) {
+                sendResponse(exchange, 400, "{\"error\": \"Некорректные данные маршрута\"}");
+                return;
+            }
+
+            if (Database.routeBooked(email, city_from, city_to, date, transport)) {
+                sendResponse(exchange, 409, "{\"error\": \"Вы уже забронировали маршрут " + city_from + " - " + city_to + " на указанную дату\"}");
+                return;
+            }
+
+            String routeId = UUID.randomUUID().toString();
+            boolean success = Database.bookRoute(email, city_from, city_to, date, transport, routeId, selectedRoutes);
+
+            if (success) {
+                sendResponse(exchange, 201, "{\"message\": \"Маршрут забронирован\", \"routeId\": \"" + routeId + "\"}");
+            } else {
+                sendResponse(exchange, 500, "{\"error\": \"Внутренняя ошибка\"}");
+            }
+        }
+    }
+
+    static class UserRoutesHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             if (handleCors(exchange)) return;
@@ -53,38 +104,10 @@ public class Api {
                 return;
             }
     
-            List<Map<String, String>> routes = Database.getRoutes(email, offset, limit);
-            String jsonResponse = convertRoutesToJson(routes);
+            List<Map<String, String>> routes = Database.getUserRoutes(email, offset, limit);
+            String jsonResponse = Utils.convertUserRoutesToJson(routes);
             sendResponse(exchange, 200, jsonResponse);
         }
-    }
-
-    public static String convertRoutesToJson(List<Map<String, String>> routes) {
-        StringBuilder jsonBuilder = new StringBuilder();
-        jsonBuilder.append("[");
-    
-        for (int i = 0; i < routes.size(); i++) {
-            Map<String, String> route = routes.get(i);
-            jsonBuilder.append("{");
-    
-            int j = 0;
-            for (Map.Entry<String, String> entry : route.entrySet()) {
-                jsonBuilder.append("\"").append(entry.getKey()).append("\":\"")
-                           .append(entry.getValue()).append("\"");
-                if (j < route.size() - 1) {
-                    jsonBuilder.append(",");
-                }
-                j++;
-            }
-    
-            jsonBuilder.append("}");
-            if (i < routes.size() - 1) {
-                jsonBuilder.append(",");
-            }
-        }
-    
-        jsonBuilder.append("]");
-        return jsonBuilder.toString();
     }
 
     static class RouteHandler implements HttpHandler {
@@ -122,7 +145,7 @@ public class Api {
         }
     }
 
-    static class CreateRouteHandler implements HttpHandler {
+    static class AllRoutesHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             if (handleCors(exchange)) return;
@@ -132,23 +155,65 @@ public class Api {
             }
     
             Map<String, String> params = Utils.parseQueryParams(Utils.readRequestBody(exchange));
-            String city_from = params.get("city_from");
-            String city_to = params.get("city_to");
-            String date = params.get("date");
             String transport = params.get("transport");
-            String email = params.get("email");
-    
-            if (city_from == null || city_to == null || date == null || transport == null) {
+            String cityFrom = params.get("city_from");
+            String cityTo = params.get("city_to");
+            String date = params.get("date");
+
+            if (cityFrom == null || cityTo == null || date == null || transport == null) {
                 sendResponse(exchange, 400, "{\"error\": \"Все поля должны быть заполнены\"}");
                 return;
             }
     
-            String routeId = Database.createRoute(email, city_from, city_to, date, transport);
-            boolean success = routeId != null;
+            RouteFinder routeFinder = new RouteFinder();
+            List<Route> allRoutes = Database.getRoutes();
+            for (Route r : allRoutes) {
+                routeFinder.addRoute(r.city_from, r.city_to, r.date_from, r.date_to, r.transport);
+            }
+            List<List<Route>> routes = routeFinder.findAllRoutes(cityFrom, cityTo);
+            String jsonResponse = Utils.convertRoutesToJson(routes);
+            sendResponse(exchange, 200, jsonResponse);
+        }
+    }
+
+    static class FindRoutesHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            if (handleCors(exchange)) return;
+            if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+                sendResponse(exchange, 405, "{\"error\": \"Метод не поддерживается\"}");
+                return;
+            }
     
-            sendResponse(exchange, success ? 201 : 500, success 
-                ? "{\"message\": \"Заказ успешно создан\", \"routeId\": \"" + routeId + "\"}" 
-                : "{\"error\": \"Ошибка бронирования\"}");
+            Map<String, String> params = Utils.parseQueryParams(Utils.readRequestBody(exchange));
+            String transport = params.get("transport");
+            String cityFrom = params.get("city_from");
+            String cityTo = params.get("city_to");
+            String date = params.get("date");
+
+            System.out.println("transport: " + transport);
+            System.out.println("city_from: " + cityFrom);
+            System.out.println("city_to: " + cityTo);
+            System.out.println("date: " + date);
+            if (cityFrom == null || cityTo == null || date == null || transport == null) {
+                sendResponse(exchange, 400, "{\"error\": \"Все поля должны быть заполнены\"}");
+                return;
+            }
+    
+            RouteFinder routeFinder = new RouteFinder();
+            Map<String, Supplier<List<Route>>> routesFuncs = Map.of(
+                "Самолёт", Database::getFlights,
+                "Автобус", Database::getBuses,
+                "Поезд", Database::getTrains,
+                "Микс", Database::getRoutes
+            );
+            List<Route> allRoutes = routesFuncs.getOrDefault(transport, Collections::emptyList).get();
+            for (Route r : allRoutes) {
+                routeFinder.addRoute(r.city_from, r.city_to, r.date_from, r.date_to, r.transport);
+            }
+            List<List<Route>> routes = routeFinder.findRoutes(cityFrom, cityTo, date.toString());
+            String jsonResponse = Utils.convertRoutesToJson(routes);
+            sendResponse(exchange, 200, jsonResponse);
         }
     }
 
@@ -235,7 +300,6 @@ public class Api {
         exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
         exchange.getResponseHeaders().set("Access-Control-Allow-Headers", "Content-Type");
         exchange.getResponseHeaders().set("Access-Control-Expose-Headers", "*");
-
         if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
             exchange.sendResponseHeaders(204, -1);
             return true;
@@ -254,7 +318,7 @@ public class Api {
 }
 
 class InputValidator {
-    /* Forbid idiots to send garbage to my site */
+    /* Ban idiots sending trash to my site */
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
 
     public static boolean isValidEmail(String email) {

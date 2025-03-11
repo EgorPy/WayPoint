@@ -64,29 +64,32 @@ const RoutesList: React.FC = () => {
 
     const noRoutes = !loading && routes.length === 0;
     return (
-        <div className="routes-container">
-            <h2 className="routes-title">Мои маршруты</h2>
-            {noRoutes && (
-                <div className="no-routes">
-                    <FaMagnifyingGlass className="no-routes-icon" />
-                    <p className="no-routes-text">Похоже, у вас ещё нет маршрутов</p>
-                    <a className="create-route" href="/">Создать новый</a>
-                </div>
-            )}
-            <ul className="routes-list">
-                {routes.map((route, index) => (
-                    <li key={index} ref={index === routes.length - 1 ? lastRouteRef : null} className="route-item" onClick={() => openCard(route)}>
-                        <div className="route-info">
-                            <span className="route-city">{route.city_from} → {route.city_to}</span>
-                            <span className="route-date">{route.date}</span>
-                        </div>
-                        <div className="route-transport">{route.transport}</div>
-                    </li>
-                ))}
-            </ul>
-            {loading && <p className="loading-text">Загрузка...</p>}
+        <div className="full-body">
+            <div className="routes-container">
+                <h2 className="routes-title">Мои маршруты</h2>
+                {noRoutes && (
+                    <div className="no-routes">
+                        <FaMagnifyingGlass className="no-routes-icon" />
+                        <p className="no-routes-text">Похоже, у вас ещё нет маршрутов</p>
+                        <a className="create-route" href="/">Создать новый</a>
+                    </div>
+                )}
+                <ul className="routes-list">
+                    {routes.map((route, index) => (
+                        <li key={index} ref={index === routes.length - 1 ? lastRouteRef : null} className="route-item" onClick={() => openCard(route)}>
+                            <div className="route-info">
+                                <span className="route-city">{route.city_from} → {route.city_to}</span>
+                                <span className="route-transport">{route.transport}</span>
+                                <span className="route-date">{route.date}</span>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+                {loading && <p className="loading-text">Загрузка...</p>}
+            </div>
+            <button className="about-button" onClick={() => navigate("/about")}>О проекте</button>
         </div>
-    );
+    );    
 };
 
 export default RoutesList;

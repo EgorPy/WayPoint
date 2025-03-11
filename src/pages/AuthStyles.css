@@ -62,8 +62,8 @@ button:hover {
 }
 
 .auth-link a {
-  color: #ffcc00;
-  text-decoration: none;
+  color: #fff;
+  font-weight: bold;
 }
 
 .auth-link a:hover {

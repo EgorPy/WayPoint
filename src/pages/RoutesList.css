@@ -1,5 +1,5 @@
 #root {
-    background: url('../background.jpg') no-repeat center center fixed;
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('../background.jpg') no-repeat center center fixed;
     background-size: cover;
     width: 100vw;
     height: 100vh;
@@ -111,7 +111,7 @@
 }
 
 .route-transport {
-    margin-top: 12px;
+    /* margin-top: 12px; */
     font-size: 18px;
     color: #fff;
     font-weight: 500;
@@ -182,9 +182,13 @@
 
 @media (max-width: 480px) {
     .routes-container {
-        width: 90%;
+        width: 100%;
         max-height: 65vh;
         padding: 10px;
+    }
+
+    .routes-list {
+        padding: 0;
     }
     
     .routes-title {
@@ -236,4 +240,31 @@
     /* text-decoration: none; */
     cursor: pointer;
     font-size: inherit;
+}
+
+.about-button {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 16px;
+    font-size: 20px;
+    background-color: #4da3ff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.about-button:hover {
+    background-color: #68b9ff;
+}
+
+.full-body {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

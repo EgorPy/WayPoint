@@ -12,7 +12,7 @@ const MapComponent: React.FC = () => {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [date, setDate] = useState("");
-  const [transport, setTransport] = useState("Самолёт");
+  const [transport, setTransport] = useState("Микс");
   const [activeField, setActiveField] = useState<"from" | "to" | null>(null);
   const mapRef = useRef<any>(null);
   const ymapsRef = useRef<any>(null);
@@ -103,58 +103,14 @@ const MapComponent: React.FC = () => {
     fetchSuggestions(value);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (from.trim().toLowerCase() === to.trim().toLowerCase()) {
       alert("Поля 'Откуда' и 'Куда' не могут быть одинаковыми");
       return;
     }
-  
-    let cityFrom = "";
-    let cityTo = "";
-  
-    if (ymapsRef.current) {
-      if (from) {
-        const result = await ymapsRef.current.geocode(from);
-        const firstGeoObject = result.geoObjects.get(0);
-        cityFrom = firstGeoObject?.getLocalities()?.[0] || firstGeoObject?.getAdministrativeAreas()?.[0] || from;
-      }
-      if (to) {
-        const result = await ymapsRef.current.geocode(to);
-        const firstGeoObject = result.geoObjects.get(0);
-        cityTo = firstGeoObject?.getLocalities()?.[0] || "";
-      }
-    }
-  
-    console.log({ cityFrom, to, date, transport });
-  
-    const email = localStorage.getItem("token");
-  
-    if (email == null) {
-      navigate("/login");
-      window.location.reload();
-    } else {
-      const formData = new URLSearchParams();
-      formData.append("city_from", cityFrom);
-      formData.append("city_to", to);
-      formData.append("date", date);
-      formData.append("transport", transport);
-      formData.append("email", email);
-  
-      try {
-        const response = await fetch("/api/create_route", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: formData.toString()
-        });
-  
-        const data = await response.json();
-        console.log("Ответ сервера:", data);
-        navigate(`/route/${data.routeId}`, { state: { booking: data.routeId } });
-      } catch (error) {
-        console.error("Ошибка отправки данных:", error);
-      }
-    }
+
+    navigate("/search_results", { state: { from, to, date, transport } });
   };
 
   const enterFrom = (e: React.KeyboardEvent<HTMLInputElement>) => {

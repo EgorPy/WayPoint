@@ -1,7 +1,7 @@
 import { FaPlane, FaBus, FaTrain, FaArrowLeft } from "react-icons/fa6";
 import { useParams, useNavigate } from "react-router-dom";
-import { FaExchangeAlt } from "react-icons/fa";
 import { useEffect, useState } from "react";
+import { FaRoute } from "react-icons/fa";
 import "./Route.css";
 
 const Route = () => {
@@ -85,8 +85,8 @@ const Route = () => {
     setTimeout(() => setCopied(false), 1500);
   };
 
-  if (loading) return <p>Загрузка...</p>;
-  if (!route) return <p>Заказ не найден</p>;
+  if (loading) return <p style={{color: "#fff", fontSize: "30px"}}>Загрузка...</p>;
+  if (!route) return <p style={{color: "#fff", fontSize: "30px"}}>Заказ не найден</p>;
 
   const getTransportIcon = (transportType: string) => {
     switch (transportType) {
@@ -97,7 +97,7 @@ const Route = () => {
       case "Автобус":
         return <FaBus className="icon" />;
       case "Микс":
-        return <FaExchangeAlt className="icon" />;
+        return <FaRoute className="icon" />;
       default:
         return null;
     }
@@ -114,9 +114,9 @@ const Route = () => {
         </div>
         <div className="route-visual">
           <span className="route-city">{route.city_from}</span>
-          <div className="route-line"></div>
+          <div className="route-line"> ——— </div>
           <div className="transport-icon">{getTransportIcon(route.transport)}</div>
-          <div className="route-line"></div>
+          <div className="route-line"> ——— </div>
           <span className="route-city">{route.city_to}</span>
         </div>
         <p className="order-details"><strong>Дата:</strong> {route.date}</p>
