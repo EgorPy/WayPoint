@@ -5,10 +5,10 @@ import com.sun.net.httpserver.HttpServer;
 import java.util.function.Supplier;
 import java.net.InetSocketAddress;
 import java.util.regex.Pattern;
+import java.util.Collections;
 import java.io.OutputStream;
 import java.io.IOException;
 import java.util.UUID;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 

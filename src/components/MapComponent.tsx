@@ -29,7 +29,6 @@ const MapComponent: React.FC = () => {
       const result = await ymapsRef.current.geocode(coords);
       const firstGeoObject = result.geoObjects.get(0);
       if (firstGeoObject) {
-        // const address = firstGeoObject.getAddressLine();
         const cityFrom = firstGeoObject.getLocalities()[0]
         console.log(cityFrom);
         setFrom(cityFrom);

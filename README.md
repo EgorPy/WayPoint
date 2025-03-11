@@ -1,46 +1,145 @@
-# Getting Started with Create React App
+# WayPoint
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Описание проекта
 
-## Available Scripts
+WayPoint — это клиент-серверный маркетплейс пассажирских перевозок, который позволяет выбирать города на карте, строить маршруты и бронировать билеты.
 
-In the project directory, you can run:
+### Фронтенд:
+- **React**
+- **TypeScript**
+- **REST API**
+- **Адаптивный UI** (удобный, без ничего лишнего)
 
-### `npm start`
+### Бекенд:
+- **Чистая Java** (из скачиваемых библиотек — только SQLite)
+- **REST API**
+- **SQLite**
+- **JSON**
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Архитектура проекта:
+1. **Фронтенд (React)** → **REST API** → **Бекенд (Java)** → **БД (SQLite)**
+2. Фронтенд и бекенд взаимодействуют через **application/x-www-form-urlencoded**
+3. **Прокси** используется для удобного обращения фронтенда к бекенду, так как оба находятся в одной директории.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### Функции:
+- **Яндекс Карта** для выбора города
+- **Определение текущего местоположения** (города) по геолокации
 
-### `npm test`
+## Данные
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Города:
+Алмата, Бангкок, Берлин, Будапешт, Бухара, Буэнос-Айрес, Варшава, Вашингтон, Гонконг, Дортмунд, Дубай, Измир, Казань, Каир, Караганда, Лагос, Лондон, Лос-Анджелес, Майами, Мехико, Минск, Молоково, Москва, Мюнхен, Нью-Йорк, Осака, Париж, Пусан, Рим, Самарканд, Сан-Франциско, Санкт-Петербург, Сеул, Сингапур, Ташкент, Токио, Франкфурт-на-Майне.
 
-### `npm run build`
+### Алгоритм:
+- **DFS-поиск** лучшего маршрута с учётом времени и типа транспорта
+- Поддерживаются **пересадки** (максимальное число — 3)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Запуск проекта
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Фронтенд
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+#### 1. Установка React:
+```sh
+npx create-react-app waypoint
+```
 
-### `npm run eject`
+#### 2. Установка Яндекс Карт:
+```sh
+npm install @pbe/react-yandex-maps
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+#### 3. Установка React Router:
+```sh 
+cd /waypoint
+```
+```sh
+npm install react-router-dom --legacy-peer-deps
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+#### 4. Создание файла `config.json`:
+Создать файл `config.json` в `C:\users\user\WayPoint\waypoint\src` с содержимым:
+```json
+{
+    "YMAPS_KEY": "<ваш_ключ_Яндекс_Карт>",
+    "BACKEND_PROXY_PORT": "<порт_бекенда>"
+}
+```
+**Ключ для Яндекс.Карт** можно получить здесь: [Яндекс API](https://developer.tech.yandex.ru/services/3)  
+(Выбрать **JavaScript API и HTTP Геокодер**)
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+#### 5. Запуск фронтенда:
+```sh
+cd C:\users\user\WayPoint\waypoint
+npm start
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+#### 6. Проверка `setupProxy.js`
+Если проект не запускается, убедитесь, что в `C:\users\user\WayPoint\waypoint\src` находится файл `setupProxy.js` с содержимым:
 
-## Learn More
+```js
+const fs = require("fs");
+const path = require("path");
+const { createProxyMiddleware } = require("http-proxy-middleware");
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+const configPath = path.resolve(__dirname, "config.json");
+const rawData = fs.readFileSync(configPath, "utf-8");
+const config = JSON.parse(rawData);
+const host = `http://localhost:${config.BACKEND_PROXY_PORT}`;
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+module.exports = function (app) {
+    app.use(
+        "/api",
+        createProxyMiddleware({
+            target: host,
+            changeOrigin: true,
+            cookieDomainRewrite: ""
+        })
+    );
+};
+```
+
+### Бекенд
+
+#### 1. Компиляция файлов:
+```sh
+javac -cp "sqlite-jdbc-3.42.0.0.jar;." Api.java Database.java Utils.java RouteFinder.java
+```
+
+#### 2. Запуск бекенда:
+```sh
+java -cp "sqlite-jdbc-3.42.0.0.jar;." Api
+```
+
+---
+
+## Важно:
+
+- **Фронтенд отправляет данные на бекенд с `Content-Type: application/x-www-form-urlencoded`**
+- **Эндпоинты в запросах должны быть указаны как**:
+  ```
+  /api/hello
+  ```
+  а **не**:
+  ```
+  http://localhost:3000/api/hello
+  https://localhost:3000/api/hello
+  ```
+
+
+# Запуск сайта через ngrok
+
+1. Установите ngrok глобально:
+   ```sh
+   npm install -g ngrok
+   ```
+
+2. Запустите сайт по стандартной инструкции.
+
+3. Откройте терминал и выполните команду:
+   ```sh
+   ngrok http 3000 --host-header=localhost
+   ```
+
+После выполнения команды в терминале появится публичный URL, который можно использовать для доступа к сайту извне, например с телефона
+
+**Всё!**

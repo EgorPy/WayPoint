@@ -345,3 +345,61 @@ header h1 {
 .back-button:hover {
   background: #4595e6;
 }
+
+.about-page {
+  position: relative;
+  top: 120px;
+  height: 90vh; /* Задаем фиксированную высоту */
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  color: white;
+  max-width: 1000px;
+  margin: auto;
+  align-items: center;
+  justify-content: flex-start; /* Изменено с center */
+  overflow: hidden; /* Чтобы контент не выходил за границы */
+}
+
+.about-content {
+  width: 100%;
+  padding: 0 20px;
+  max-height: 80vh; /* Ограничиваем высоту */
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.5) transparent;
+}
+
+.about-content li {
+  font-size: 20px;
+}
+
+.about-content div {
+  font-size: 20px;
+}
+
+.about-content h2 {
+  margin-bottom: 0px;
+}
+
+.about-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.about-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 3px;
+}
+
+.about-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.about-content p {
+  font-size: 20px;
+}
