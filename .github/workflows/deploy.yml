@@ -1,0 +1,66 @@
+name: Deploy WayPoint
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout репозитория
+        uses: actions/checkout@v4
+
+      - name: Установка Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Установка зависимостей
+        run: npm install
+        working-directory: waypoint
+
+      - name: Сборка фронтенда
+        run: npm run build
+        working-directory: waypoint
+
+      - name: Копирование фронтенда на сервер
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASS }}
+          source: "waypoint/build"
+          target: "/var/www/waypoint"
+
+  deploy_backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout репозитория
+        uses: actions/checkout@v4
+
+      - name: Компиляция Java бэкенда
+        run: javac -cp "sqlite-jdbc-3.42.0.0.jar;." Api.java Database.java Utils.java RouteFinder.java
+        working-directory: backend
+
+      - name: Копирование бэкенда на сервер
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASS }}
+          source: "backend/*.class"
+          target: "/var/www/backend"
+
+      - name: Перезапуск сервиса
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASS }}
+          script: |
+            cd /var/www/backend
+            nohup java -cp "sqlite-jdbc-3.42.0.0.jar;." Api > api.log 2>&1 &
